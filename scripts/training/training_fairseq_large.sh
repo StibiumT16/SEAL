@@ -11,7 +11,7 @@ BART_FILES=$2
 # $BART_FILES must contain the following file:
 # - $BART_FILES/bart.large/model.pt - https://dl.fbaipublicfiles.com/fairseq/models/bart.large.tar.gz (decompress)
 
-fairseq-train \
+CUDA_VISIBLE_DEVICES=0 fairseq-train \
   "${DATASET}"/bin \
   --finetune-from-model "${BART_FILES}"/bart.large/model.pt \
   --arch bart_large \
