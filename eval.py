@@ -3,7 +3,8 @@ from tqdm import tqdm
 from seal import FMIndex, SEALSearcher
 from seal.evaluate import evaluator
 
-searcher = SEALSearcher.load("NQ_320k/FM_Index/NQ_320k.base.fm_index", "checkpoints/checkpoint_best.pt", device='cuda:0' )
+searcher = SEALSearcher.load("NQ_320k/FM_Index/NQ_320k.base.fm_index", "checkpoints/checkpoint_last.pt", backbone = 'facebook/bart-base', device='cuda:0')
+#default backbone: bart-large
 searcher.include_keys = True
 myevaluator = evaluator()
 

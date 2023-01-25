@@ -561,7 +561,8 @@ class SEALSearcher:
     @staticmethod
     def load_bart(bart_model_path: str, device: str = "cpu", backbone="facebook/bart-large", fairseq_checkpoint=True):
 
-        logger.log(logging.WARN, f"initializing BART large")
+        logger.log(logging.WARN, f"initializing BART")
+        print("Backbone Model: " + backbone)
         config = AutoConfig.from_pretrained(backbone)
         config.forced_bos_token_id = None
         tokenizer = AutoTokenizer.from_pretrained(backbone)

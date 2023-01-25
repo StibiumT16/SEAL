@@ -16,6 +16,7 @@ def _remove_ignore_keys_(state_dict):
         "model.decoder.version",
         "_float_tensor",
         "decoder.output_projection.weight",
+        "encoder.layers"
     ]
     for k in ignore_keys:
         state_dict.pop(k, None)
@@ -36,7 +37,7 @@ def load_state_dict_from_lightning_checkpoint(model, path):
     # _remove_ignore_keys_(state_dict)
     # if hasattr(model, "lm_head"):
     #     model.lm_head = _make_linear_from_emb(model.model.shared)
-    model.load_state_dict(state_dict)
+    model.load_state_dict(state_dict, strict=False)
 
 
 def load_state_dict_from_fairseq_checkpoint(model, path):
@@ -44,7 +45,15 @@ def load_state_dict_from_fairseq_checkpoint(model, path):
     state_dict["shared.weight"] = state_dict["decoder.embed_tokens.weight"]
     for key in ["shared.weight", "encoder.embed_tokens.weight", "decoder.embed_tokens.weight"]:
         state_dict[key] = torch.cat([state_dict[key], torch.zeros_like(state_dict[key][:1])], 0)
+
+    vocab_size = state_dict["shared.weight"].shape[0]
+    if vocab_size > model.config.vocab_size:
+        print("convert vocab_size from " + str(vocab_size) + " to " + str(model.config.vocab_size))
+        for key, value in state_dict.items():
+            if key in ["shared.weight", "encoder.embed_tokens.weight", "decoder.embed_tokens.weight"]:
+                state_dict[key] = value[:model.config.vocab_size, :]
+    
     _remove_ignore_keys_(state_dict)
     if hasattr(model, "lm_head"):
         model.lm_head = _make_linear_from_emb(model.model.shared)
-    model.model.load_state_dict(state_dict)
+    model.model.load_state_dict(state_dict, strict=False)
